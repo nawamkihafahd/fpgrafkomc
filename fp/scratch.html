@@ -78,7 +78,7 @@
 			var moveLeft = false;
 			var moveRight = false;
 			var canJump = false;
-
+			var falling = false;
 			var prevTime = performance.now();
 			var velocity = new THREE.Vector3();
 			var direction = new THREE.Vector3();
@@ -226,7 +226,18 @@
 
 				var floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				scene.add( floor );
-
+				
+				
+				var holeGeometry = new THREE.PlaneGeometry( 30, 30, 100);
+				holeGeometry.rotateX( - Math.PI / 2 );
+				var holeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000 } );
+				var hole1 = new THREE.Mesh(holeGeometry, holeMaterial);
+				hole1.position.x = -100;
+				hole1.position.y = 1;
+				hole1.position.z = -100;
+				
+				scene.add(hole1);
+				holes.push(hole1);
 				// objects
 
 				var boxGeometry = new THREE.BoxGeometry( walllength, wallheight, wallwidth );
@@ -294,7 +305,7 @@
 					
 					velocity.x = 0;
 					velocity.z = 0;
-					if(onground)
+					if(onground && falling == false)
 					{
 						velocity.y = 0;
 					}
@@ -492,17 +503,29 @@
 					}
 
 					
-					
+					for(var i = 0; i<holes.length ; i++)
+					{
+						if(box2.position.x - 10 > holes[i].position.x - 15 && box2.position.x + 10 < holes[i].position.x + 15 && box2.position.z - 10 > holes[i].position.z - 15 && box2.position.z + 10 < holes[i].position.z + 15)
+						{
+							falling = true;
+							break;
+						}
+						falling = false;
+					}
 					
 					
 					
 
 					if ( box2.position.y < 10 ) {
-						onground = 1;
-						velocity.y = 0;
-						box2.position.y = 10;
+						if(falling === false)
+						{
+							onground = 1;
+							velocity.y = 0;
+							box2.position.y = 10;
 
-						canJump = true;
+							canJump = true;
+						}
+						
 
 					}
 					
