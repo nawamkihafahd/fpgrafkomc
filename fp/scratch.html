@@ -68,8 +68,10 @@
 			var camera, scene, renderer, controls;
 
 			var objects = [];
+			var holes = [];
+			var treasures = [];
+			var treasuresget;
 
-			var raycaster;
 
 			var moveForward = false;
 			var moveBackward = false;
@@ -90,6 +92,8 @@
 			var wallheight = 500;
 			var walllength = 20;
 			var wallwidth = 100;
+			var viewmode = 0;
+			var onground;
 
 			init();
 			animate();
@@ -140,7 +144,11 @@
 							break;
 
 						case 32: // space
-							if ( canJump === true ) velocity.y += 350;
+							if ( canJump === true )
+							{
+								velocity.y += 350;
+								onground = 0;
+							}
 							canJump = false;
 							break;
 
@@ -170,6 +178,35 @@
 						case 39: // right
 						case 68: // d
 							moveRight = false;
+							break;
+						case 13: //enter
+							viewmode += 1;
+							viewmode = viewmode%4;
+							if(viewmode == 0)
+							{
+								camera.position.x = box2.position.x;
+								camera.position.y = box2.position.y + 100;
+								camera.position.z = box2.position.z + 100;
+							}
+							else if(viewmode == 1)
+							{
+								camera.position.x = box2.position.x - 100;
+								camera.position.y = box2.position.y + 100;
+								camera.position.z = box2.position.z;
+							}
+							else if(viewmode == 2)
+							{
+								camera.position.x = box2.position.x;
+								camera.position.y = box2.position.y + 100;
+								camera.position.z = box2.position.z - 100;
+							}
+							else if(viewmode == 3)
+							{
+								camera.position.x = box2.position.x + 100;
+								camera.position.y = box2.position.y + 100;
+								camera.position.z = box2.position.z;
+							}
+							camera.lookAt(box2.position)
 							break;
 
 					}
@@ -257,8 +294,15 @@
 					
 					velocity.x = 0;
 					velocity.z = 0;
-
-					velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+					if(onground)
+					{
+						velocity.y = 0;
+					}
+					else
+					{
+						velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+					}
+					
 					
 
 					if ( moveForward )
@@ -277,21 +321,184 @@
 					{
 						velocity.x -= direction.x * 1200.0 * delta;
 					}
-
-					box2.translateX( velocity.x * delta );
-					box2.translateY( velocity.y * delta );
-					box2.translateZ( velocity.z * delta );
 					
-					camera.translateX( velocity.x * delta );
-					camera.translateZ( velocity.z * delta / Math.sqrt(2) );
-					camera.translateY( -velocity.z * delta / Math.sqrt(2));
+					if(viewmode == 0)
+					{
+						box2.translateX( velocity.x * delta );
+						box2.translateY( velocity.y * delta );
+						box2.translateZ( velocity.z * delta );
+					
+						camera.position.x = box2.position.x;
+						camera.position.y = box2.position.y + 100;
+						camera.position.z = box2.position.z + 100;
+						
+						for(var i = 0; i<objects.length ; i++)
+						{
+							if(((box2.position.x + 10) > (objects[i].position.x -walllength/2)&& (box2.position.x - 10) < (objects[i].position.x+walllength/2)) && ((box2.position.z + 10) > (objects[i].position.z -wallwidth/2)&& (box2.position.z - 10) < (objects[i].position.z+wallwidth/2)) && ((box2.position.y + 10) > (objects[i].position.y -wallheight/2)&& (box2.position.y - 10) < (objects[i].position.y+wallheight/2)))
+							{
+								if(velocity.x > 0)
+								{
+									flagx = 0;
+									box2.position.x = objects[i].position.x - walllength/2 - 10;
+									camera.position.x = box2.position.x;
+								}
+								if(velocity.x < 0)
+								{
+									flagx = 0;
+									box2.position.x = objects[i].position.x + walllength/2 + 10;
+									camera.position.x = box2.position.x;
+								}
+								if(velocity.z > 0)
+								{
+									flagz = 0;
+									box2.position.z = objects[i].position.z - wallwidth/2 - 10;
+									camera.position.z = box2.position.z +100;
+								}
+								if(velocity.z < 0)
+								{
+									flagz = 0;
+									box2.position.z = objects[i].position.z + wallwidth/2 + 10;
+									camera.position.z = box2.position.z + 100;
+								}
+						
+						}
+					}
+					}
+					else if(viewmode == 1)
+					{
+						box2.translateX( -velocity.z * delta );
+						box2.translateY( velocity.y * delta );
+						box2.translateZ( velocity.x * delta );
+					
+						camera.position.x = box2.position.x - 100;
+						camera.position.y = box2.position.y + 100;
+						camera.position.z = box2.position.z;
+						
+						for(var i = 0; i<objects.length ; i++)
+						{
+							if(((box2.position.x + 10) > (objects[i].position.x -walllength/2)&& (box2.position.x - 10) < (objects[i].position.x+walllength/2)) && ((box2.position.z + 10) > (objects[i].position.z -wallwidth/2)&& (box2.position.z - 10) < (objects[i].position.z+wallwidth/2)) && ((box2.position.y + 10) > (objects[i].position.y -wallheight/2)&& (box2.position.y - 10) < (objects[i].position.y+wallheight/2)))
+							{
+								if(velocity.z < 0)
+								{
+									flagx = 0;
+									box2.position.x = objects[i].position.x - walllength/2 - 10;
+									camera.position.x = box2.position.x-100;
+								}
+								if(velocity.z > 0)
+								{
+									flagx = 0;
+									box2.position.x = objects[i].position.x + walllength/2 + 10;
+									camera.position.x = box2.position.x-100;
+								}
+								if(velocity.x > 0)
+								{
+									flagz = 0;
+									box2.position.z = objects[i].position.z - wallwidth/2 - 10;
+									camera.position.z = box2.position.z;
+								}
+								if(velocity.x < 0)
+								{
+									flagz = 0;
+									box2.position.z = objects[i].position.z + wallwidth/2 + 10;
+									camera.position.z = box2.position.z;
+								}
+							}
+						
+						}
+					}
+					else if(viewmode == 2)
+					{
+						box2.translateX( -velocity.x * delta );
+						box2.translateY( velocity.y * delta );
+						box2.translateZ( -velocity.z * delta );
+					
+						camera.position.x = box2.position.x;
+						camera.position.y = box2.position.y + 100;
+						camera.position.z = box2.position.z - 100;
+						
+						
+						for(var i = 0; i<objects.length ; i++)
+						{
+							if(((box2.position.x + 10) > (objects[i].position.x -walllength/2)&& (box2.position.x - 10) < (objects[i].position.x+walllength/2)) && ((box2.position.z + 10) > (objects[i].position.z -wallwidth/2)&& (box2.position.z - 10) < (objects[i].position.z+wallwidth/2)) && ((box2.position.y + 10) > (objects[i].position.y -wallheight/2)&& (box2.position.y - 10) < (objects[i].position.y+wallheight/2)))
+							{
+								if(velocity.x < 0)
+								{
+									flagx = 0;
+									box2.position.x = objects[i].position.x - walllength/2 - 10;
+									camera.position.x = box2.position.x;
+								}
+								if(velocity.x > 0)
+								{
+									flagx = 0;
+									box2.position.x = objects[i].position.x + walllength/2 + 10;
+									camera.position.x = box2.position.x;
+								}
+								if(velocity.z < 0)
+								{
+									flagz = 0;
+									box2.position.z = objects[i].position.z - wallwidth/2 - 10;
+									camera.position.z = box2.position.z -100;
+								}
+								if(velocity.z > 0)
+								{
+									flagz = 0;
+									box2.position.z = objects[i].position.z + wallwidth/2 + 10;
+									camera.position.z = box2.position.z - 100;
+								}
+							}
+						}
+					}
+					else if(viewmode == 3)
+					{
+						box2.translateX( velocity.z * delta );
+						box2.translateY( velocity.y * delta );
+						box2.translateZ( -velocity.x * delta );
+					
+						camera.position.x = box2.position.x + 100;
+						camera.position.y = box2.position.y + 100;
+						camera.position.z = box2.position.z;
+						
+						
+						for(var i = 0; i<objects.length ; i++)
+						{
+							if(((box2.position.x + 10) > (objects[i].position.x -walllength/2)&& (box2.position.x - 10) < (objects[i].position.x+walllength/2)) && ((box2.position.z + 10) > (objects[i].position.z -wallwidth/2)&& (box2.position.z - 10) < (objects[i].position.z+wallwidth/2)) && ((box2.position.y + 10) > (objects[i].position.y -wallheight/2)&& (box2.position.y - 10) < (objects[i].position.y+wallheight/2)))
+							{
+								if(velocity.z > 0)
+								{
+									flagx = 0;
+									box2.position.x = objects[i].position.x - walllength/2 - 10;
+									camera.position.x = box2.position.x + 100;
+								}
+								if(velocity.z < 0)
+								{
+									flagx = 0;
+									box2.position.x = objects[i].position.x + walllength/2 + 10;
+									camera.position.x = box2.position.x + 100;
+								}
+								if(velocity.x < 0)
+								{
+									flagz = 0;
+									box2.position.z = objects[i].position.z - wallwidth/2 - 10;
+									camera.position.z = box2.position.z;
+								}
+								if(velocity.x > 0)
+								{
+									flagz = 0;
+									box2.position.z = objects[i].position.z + wallwidth/2 + 10;
+									camera.position.z = box2.position.z;
+								}
+							}
+						}
+					}
+
+					
 					
 					
 					
 					
 
 					if ( box2.position.y < 10 ) {
-
+						onground = 1;
 						velocity.y = 0;
 						box2.position.y = 10;
 
@@ -299,37 +506,7 @@
 
 					}
 					
-					for(var i = 0; i<objects.length ; i++)
-					{
-						if(((box2.position.x + 10) > (objects[i].position.x -walllength/2)&& (box2.position.x - 10) < (objects[i].position.x+walllength/2)) && ((box2.position.z + 10) > (objects[i].position.z -wallwidth/2)&& (box2.position.z - 10) < (objects[i].position.z+wallwidth/2)) && ((box2.position.y + 10) > (objects[i].position.y -wallheight/2)&& (box2.position.y - 10) < (objects[i].position.y+wallheight/2)))
-						{
-							if(velocity.x > 0)
-							{
-								flagx = 0;
-								box2.position.x = objects[i].position.x - walllength/2 - 10;
-								camera.position.x = box2.position.x;
-							}
-							if(velocity.x < 0)
-							{
-								flagx = 0;
-								box2.position.x = objects[i].position.x + walllength/2 + 10;
-								camera.position.x = box2.position.x;
-							}
-							if(velocity.z > 0)
-							{
-								flagz = 0;
-								box2.position.z = objects[i].position.z - wallwidth/2 - 10;
-								camera.position.z = box2.position.z +100;
-							}
-							if(velocity.z < 0)
-							{
-								flagz = 0;
-								box2.position.z = objects[i].position.z + wallwidth/2 + 10;
-								camera.position.z = box2.position.z + 100;
-							}
-						
-						}
-					}
+					
 					
 					
 					
