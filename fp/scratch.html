@@ -70,6 +70,8 @@
 			var objects = [];
 			var holes = [];
 			var treasures = [];
+			var holeposx  = [60];
+			var holeposz = [-40];
 			var treasuresget;
 
 
@@ -90,10 +92,18 @@
 			var flagx;
 			var flagz;
 			var wallheight = 500;
-			var walllength = 20;
-			var wallwidth = 100;
+			var walllength = [20, 440, 20, 520, 20, 380, 280, 120, 120, 20, 20, 20, 360, 40];
+			var wallwidth = [380, 20, 360, 20, 100, 20, 20, 20, 20, 160, 80, 100, 20, 160];
+			var wallposx = [10, 320, 530, 280, 110, 290, 380, 460, 460, 190, 250, 310, 340, 100];
+			var wallposz = [190, 10, 180, 370, 70, 130, 190, 270, 310, 280, 320, 310, 70, 260];
 			var viewmode = 0;
 			var onground;
+			var treasureget = 0;
+			var startposx = 60;
+			var startposz = 10;
+			var startposy = 10;
+			var campos = 50;
+			var holesize = 30;
 
 			init();
 			animate();
@@ -146,7 +156,7 @@
 						case 32: // space
 							if ( canJump === true )
 							{
-								velocity.y += 350;
+								velocity.y += 500;
 								onground = 0;
 							}
 							canJump = false;
@@ -185,29 +195,39 @@
 							if(viewmode == 0)
 							{
 								camera.position.x = box2.position.x;
-								camera.position.y = box2.position.y + 100;
-								camera.position.z = box2.position.z + 100;
+								camera.position.y = box2.position.y + campos;
+								camera.position.z = box2.position.z + campos;
 							}
 							else if(viewmode == 1)
 							{
-								camera.position.x = box2.position.x - 100;
-								camera.position.y = box2.position.y + 100;
+								camera.position.x = box2.position.x - campos;
+								camera.position.y = box2.position.y + campos;
 								camera.position.z = box2.position.z;
 							}
 							else if(viewmode == 2)
 							{
 								camera.position.x = box2.position.x;
-								camera.position.y = box2.position.y + 100;
-								camera.position.z = box2.position.z - 100;
+								camera.position.y = box2.position.y + campos;
+								camera.position.z = box2.position.z - campos;
 							}
 							else if(viewmode == 3)
 							{
-								camera.position.x = box2.position.x + 100;
-								camera.position.y = box2.position.y + 100;
+								camera.position.x = box2.position.x + campos;
+								camera.position.y = box2.position.y + campos;
 								camera.position.z = box2.position.z;
 							}
 							camera.lookAt(box2.position)
 							break;
+						case 90:
+							//alert((box.position.x - treasure.position.x)*(box.position.x - treasure.position.x) + (box.position.z - treasure.position.z)*(box.position.z - treasure.position.z));
+							treasureget = 1;
+							if((box2.position.x - treasure.position.x)*(box2.position.x - treasure.position.x) + (box2.position.z - treasure.position.z)*(box2.position.z - treasure.position.z) < 500)
+							{
+								alert("you get the treasure");
+							}
+							break;
+							
+							
 
 					}
 
@@ -227,43 +247,52 @@
 				var floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				scene.add( floor );
 				
+				for(var j = 0; j< holeposx.length; j++)
+				{
+					var holeGeometry = new THREE.PlaneGeometry( holesize, holesize, 100);
+					holeGeometry.rotateX( - Math.PI / 2 );
+					var holeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000 } );
+					var hole1 = new THREE.Mesh(holeGeometry, holeMaterial);
+					hole1.position.x = holeposx[j];
+					hole1.position.y = 1;
+					hole1.position.z = holeposz[j];
 				
-				var holeGeometry = new THREE.PlaneGeometry( 30, 30, 100);
-				holeGeometry.rotateX( - Math.PI / 2 );
-				var holeMaterial = new THREE.MeshBasicMaterial( { color: 0x000000 } );
-				var hole1 = new THREE.Mesh(holeGeometry, holeMaterial);
-				hole1.position.x = -100;
-				hole1.position.y = 1;
-				hole1.position.z = -100;
+					scene.add(hole1);
+					holes.push(hole1);
+				}
 				
-				scene.add(hole1);
-				holes.push(hole1);
+				
+				var treasureGeometry = new THREE.BoxGeometry( 20, 20, 20 );
+				var treasureMaterial = new THREE.MeshPhongMaterial( { specular: 0xffff00, flatShading: true, vertexColors: THREE.VertexColors } );
+				var treasure = new THREE.Mesh(treasureGeometry, treasureMaterial);
+				treasure.position.x = 510;
+				treasure.position.z = 340;
+				
+				scene.add(treasure);
+				
+				
+				
 				// objects
+				for(var i = 0; i< walllength.length ; i++)
+				{
+					var boxGeometry = new THREE.BoxGeometry( walllength[i], wallheight, wallwidth[i] );
 
-				var boxGeometry = new THREE.BoxGeometry( walllength, wallheight, wallwidth );
-
-				var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
-				box = new THREE.Mesh( boxGeometry, boxMaterial );
-				box.position.x = 100;
-				box.position.z = 0;
-				scene.add(box);
-				objects.push(box);
+					var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+					var box = new THREE.Mesh( boxGeometry, boxMaterial );
+					box.position.x = wallposx[i];
+					box.position.z = wallposz[i];
+					scene.add(box);
+					objects.push(box);
+				}
 				
-				var box3Geometry = new THREE.BoxGeometry( walllength, wallheight, wallwidth );
-				var box3Material = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
-				box3 = new THREE.Mesh( box3Geometry, box3Material );
-				box3.position.x = 100;
-				box3.position.z = 100;
-				scene.add(box3);
-				objects.push(box3);
 				
 				var box2Geometry = new THREE.BoxGeometry( 20, 20, 20 );
 				var box2Material = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
 				box2 = new THREE.Mesh( box2Geometry, box2Material );
-				box2.position.x = 0;
-				box2.position.z = 0;
+				box2.position.x = startposx;
+				box2.position.z = startposz;
 				scene.add(box2);
-				camera.position.set(0,100,100);
+				camera.position.set(startposx,startposy+campos,startposz+campos);
 				camera.lookAt(box2.position);
 				
 
@@ -318,19 +347,19 @@
 
 					if ( moveForward )
 					{
-						velocity.z -=  direction.z * 1200.0 * delta ;
+						velocity.z -=  direction.z * 2000.0 * delta ;
 					}					
 					if ( moveBackward ) 
 					{
-						velocity.z -=  direction.z * 1200.0 * delta;
+						velocity.z -=  direction.z * 2000.0 * delta;
 					}
 					if ( moveLeft) 
 					{
-						velocity.x -= direction.x * 1200.0 * delta;
+						velocity.x -= direction.x * 2000.0 * delta;
 					}
 					if ( moveRight ) 
 					{
-						velocity.x -= direction.x * 1200.0 * delta;
+						velocity.x -= direction.x * 2000.0 * delta;
 					}
 					
 					if(viewmode == 0)
@@ -340,36 +369,36 @@
 						box2.translateZ( velocity.z * delta );
 					
 						camera.position.x = box2.position.x;
-						camera.position.y = box2.position.y + 100;
-						camera.position.z = box2.position.z + 100;
+						camera.position.y = box2.position.y + campos;
+						camera.position.z = box2.position.z + campos;
 						
 						for(var i = 0; i<objects.length ; i++)
 						{
-							if(((box2.position.x + 10) > (objects[i].position.x -walllength/2)&& (box2.position.x - 10) < (objects[i].position.x+walllength/2)) && ((box2.position.z + 10) > (objects[i].position.z -wallwidth/2)&& (box2.position.z - 10) < (objects[i].position.z+wallwidth/2)) && ((box2.position.y + 10) > (objects[i].position.y -wallheight/2)&& (box2.position.y - 10) < (objects[i].position.y+wallheight/2)))
+							if(((box2.position.x + 10) > (objects[i].position.x -walllength[i]/2)&& (box2.position.x - 10) < (objects[i].position.x+walllength[i]/2)) && ((box2.position.z + 10) > (objects[i].position.z -wallwidth[i]/2)&& (box2.position.z - 10) < (objects[i].position.z+wallwidth[i]/2)) && ((box2.position.y + 10) > (objects[i].position.y -wallheight/2)&& (box2.position.y - 10) < (objects[i].position.y+wallheight/2)))
 							{
 								if(velocity.x > 0)
 								{
 									flagx = 0;
-									box2.position.x = objects[i].position.x - walllength/2 - 10;
+									box2.position.x = objects[i].position.x - walllength[i]/2 - 10;
 									camera.position.x = box2.position.x;
 								}
 								if(velocity.x < 0)
 								{
 									flagx = 0;
-									box2.position.x = objects[i].position.x + walllength/2 + 10;
+									box2.position.x = objects[i].position.x + walllength[i]/2 + 10;
 									camera.position.x = box2.position.x;
 								}
 								if(velocity.z > 0)
 								{
 									flagz = 0;
-									box2.position.z = objects[i].position.z - wallwidth/2 - 10;
-									camera.position.z = box2.position.z +100;
+									box2.position.z = objects[i].position.z - wallwidth[i]/2 - 10;
+									camera.position.z = box2.position.z +campos;
 								}
 								if(velocity.z < 0)
 								{
 									flagz = 0;
-									box2.position.z = objects[i].position.z + wallwidth/2 + 10;
-									camera.position.z = box2.position.z + 100;
+									box2.position.z = objects[i].position.z + wallwidth[i]/2 + 10;
+									camera.position.z = box2.position.z + campos;
 								}
 						
 						}
@@ -381,36 +410,36 @@
 						box2.translateY( velocity.y * delta );
 						box2.translateZ( velocity.x * delta );
 					
-						camera.position.x = box2.position.x - 100;
-						camera.position.y = box2.position.y + 100;
+						camera.position.x = box2.position.x - campos;
+						camera.position.y = box2.position.y + campos;
 						camera.position.z = box2.position.z;
 						
 						for(var i = 0; i<objects.length ; i++)
 						{
-							if(((box2.position.x + 10) > (objects[i].position.x -walllength/2)&& (box2.position.x - 10) < (objects[i].position.x+walllength/2)) && ((box2.position.z + 10) > (objects[i].position.z -wallwidth/2)&& (box2.position.z - 10) < (objects[i].position.z+wallwidth/2)) && ((box2.position.y + 10) > (objects[i].position.y -wallheight/2)&& (box2.position.y - 10) < (objects[i].position.y+wallheight/2)))
+							if(((box2.position.x + 10) > (objects[i].position.x -walllength[i]/2)&& (box2.position.x - 10) < (objects[i].position.x+walllength[i]/2)) && ((box2.position.z + 10) > (objects[i].position.z -wallwidth[i]/2)&& (box2.position.z - 10) < (objects[i].position.z+wallwidth[i]/2)) && ((box2.position.y + 10) > (objects[i].position.y -wallheight/2)&& (box2.position.y - 10) < (objects[i].position.y+wallheight/2)))
 							{
 								if(velocity.z < 0)
 								{
 									flagx = 0;
-									box2.position.x = objects[i].position.x - walllength/2 - 10;
-									camera.position.x = box2.position.x-100;
+									box2.position.x = objects[i].position.x - walllength[i]/2 - 10;
+									camera.position.x = box2.position.x-campos;
 								}
 								if(velocity.z > 0)
 								{
 									flagx = 0;
-									box2.position.x = objects[i].position.x + walllength/2 + 10;
-									camera.position.x = box2.position.x-100;
+									box2.position.x = objects[i].position.x + walllength[i]/2 + 10;
+									camera.position.x = box2.position.x-campos;
 								}
 								if(velocity.x > 0)
 								{
 									flagz = 0;
-									box2.position.z = objects[i].position.z - wallwidth/2 - 10;
+									box2.position.z = objects[i].position.z - wallwidth[i]/2 - 10;
 									camera.position.z = box2.position.z;
 								}
 								if(velocity.x < 0)
 								{
 									flagz = 0;
-									box2.position.z = objects[i].position.z + wallwidth/2 + 10;
+									box2.position.z = objects[i].position.z + wallwidth[i]/2 + 10;
 									camera.position.z = box2.position.z;
 								}
 							}
@@ -424,37 +453,37 @@
 						box2.translateZ( -velocity.z * delta );
 					
 						camera.position.x = box2.position.x;
-						camera.position.y = box2.position.y + 100;
-						camera.position.z = box2.position.z - 100;
+						camera.position.y = box2.position.y + campos;
+						camera.position.z = box2.position.z - campos;
 						
 						
 						for(var i = 0; i<objects.length ; i++)
 						{
-							if(((box2.position.x + 10) > (objects[i].position.x -walllength/2)&& (box2.position.x - 10) < (objects[i].position.x+walllength/2)) && ((box2.position.z + 10) > (objects[i].position.z -wallwidth/2)&& (box2.position.z - 10) < (objects[i].position.z+wallwidth/2)) && ((box2.position.y + 10) > (objects[i].position.y -wallheight/2)&& (box2.position.y - 10) < (objects[i].position.y+wallheight/2)))
+							if(((box2.position.x + 10) > (objects[i].position.x -walllength[i]/2)&& (box2.position.x - 10) < (objects[i].position.x+walllength[i]/2)) && ((box2.position.z + 10) > (objects[i].position.z -wallwidth[i]/2)&& (box2.position.z - 10) < (objects[i].position.z+wallwidth[i]/2)) && ((box2.position.y + 10) > (objects[i].position.y -wallheight/2)&& (box2.position.y - 10) < (objects[i].position.y+wallheight/2)))
 							{
 								if(velocity.x < 0)
 								{
 									flagx = 0;
-									box2.position.x = objects[i].position.x - walllength/2 - 10;
+									box2.position.x = objects[i].position.x - walllength[i]/2 - 10;
 									camera.position.x = box2.position.x;
 								}
 								if(velocity.x > 0)
 								{
 									flagx = 0;
-									box2.position.x = objects[i].position.x + walllength/2 + 10;
+									box2.position.x = objects[i].position.x + walllength[i]/2 + 10;
 									camera.position.x = box2.position.x;
 								}
 								if(velocity.z < 0)
 								{
 									flagz = 0;
-									box2.position.z = objects[i].position.z - wallwidth/2 - 10;
-									camera.position.z = box2.position.z -100;
+									box2.position.z = objects[i].position.z - wallwidth[i]/2 - 10;
+									camera.position.z = box2.position.z -campos;
 								}
 								if(velocity.z > 0)
 								{
 									flagz = 0;
-									box2.position.z = objects[i].position.z + wallwidth/2 + 10;
-									camera.position.z = box2.position.z - 100;
+									box2.position.z = objects[i].position.z + wallwidth[i]/2 + 10;
+									camera.position.z = box2.position.z - campos;
 								}
 							}
 						}
@@ -465,37 +494,37 @@
 						box2.translateY( velocity.y * delta );
 						box2.translateZ( -velocity.x * delta );
 					
-						camera.position.x = box2.position.x + 100;
-						camera.position.y = box2.position.y + 100;
+						camera.position.x = box2.position.x + campos;
+						camera.position.y = box2.position.y + campos;
 						camera.position.z = box2.position.z;
 						
 						
 						for(var i = 0; i<objects.length ; i++)
 						{
-							if(((box2.position.x + 10) > (objects[i].position.x -walllength/2)&& (box2.position.x - 10) < (objects[i].position.x+walllength/2)) && ((box2.position.z + 10) > (objects[i].position.z -wallwidth/2)&& (box2.position.z - 10) < (objects[i].position.z+wallwidth/2)) && ((box2.position.y + 10) > (objects[i].position.y -wallheight/2)&& (box2.position.y - 10) < (objects[i].position.y+wallheight/2)))
+							if(((box2.position.x + 10) > (objects[i].position.x -walllength[i]/2)&& (box2.position.x - 10) < (objects[i].position.x+walllength[i]/2)) && ((box2.position.z + 10) > (objects[i].position.z -wallwidth[i]/2)&& (box2.position.z - 10) < (objects[i].position.z+wallwidth[i]/2)) && ((box2.position.y + 10) > (objects[i].position.y -wallheight/2)&& (box2.position.y - 10) < (objects[i].position.y+wallheight/2)))
 							{
 								if(velocity.z > 0)
 								{
 									flagx = 0;
-									box2.position.x = objects[i].position.x - walllength/2 - 10;
-									camera.position.x = box2.position.x + 100;
+									box2.position.x = objects[i].position.x - walllength[i]/2 - 10;
+									camera.position.x = box2.position.x + campos;
 								}
 								if(velocity.z < 0)
 								{
 									flagx = 0;
-									box2.position.x = objects[i].position.x + walllength/2 + 10;
-									camera.position.x = box2.position.x + 100;
+									box2.position.x = objects[i].position.x + walllength[i]/2 + 10;
+									camera.position.x = box2.position.x + campos;
 								}
 								if(velocity.x < 0)
 								{
 									flagz = 0;
-									box2.position.z = objects[i].position.z - wallwidth/2 - 10;
+									box2.position.z = objects[i].position.z - wallwidth[i]/2 - 10;
 									camera.position.z = box2.position.z;
 								}
 								if(velocity.x > 0)
 								{
 									flagz = 0;
-									box2.position.z = objects[i].position.z + wallwidth/2 + 10;
+									box2.position.z = objects[i].position.z + wallwidth[i]/2 + 10;
 									camera.position.z = box2.position.z;
 								}
 							}
@@ -505,7 +534,7 @@
 					
 					for(var i = 0; i<holes.length ; i++)
 					{
-						if(box2.position.x - 10 > holes[i].position.x - 15 && box2.position.x + 10 < holes[i].position.x + 15 && box2.position.z - 10 > holes[i].position.z - 15 && box2.position.z + 10 < holes[i].position.z + 15)
+						if(box2.position.x > holes[i].position.x - holesize/2 && box2.position.x < holes[i].position.x + holesize/2 && box2.position.z > holes[i].position.z - holesize/2 && box2.position.z  < holes[i].position.z + holesize/2)
 						{
 							falling = true;
 							break;
@@ -525,8 +554,28 @@
 
 							canJump = true;
 						}
+						if(box2.position.y < -100)
+						{
+							box2.position.x = startposx;
+							box2.position.z = startposz;
+							falling = false;
+							
+							viewmode = 0;
+							
+							camera.position.x = box2.position.x;
+							camera.position.z = box2.position.z + campos;
+							
+							camera.lookAt(box2.position);
+							
+						}
 						
 
+					}
+					
+					if(treasureget == 1)
+					{
+						treasureget = 0;
+						
 					}
 					
 					
