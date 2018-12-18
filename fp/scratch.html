@@ -66,7 +66,7 @@
 		<script>
 
 			var camera, scene, renderer, controls;
-
+			var wallmat;
 			var objects = [];
 			var holes = [];
 			var treasures = [];
@@ -277,11 +277,14 @@
 
 
 				// floor
-
+				var floortexture = new THREE.TextureLoader().load( 'stone_texture205.jpg' );
+				floortexture.wrapS = floortexture.wrapT = THREE.RepeatWrapping;
+				floortexture.repeat.set( 15, 15 );
 				var floorGeometry = new THREE.PlaneGeometry( 2000, 2000, 100);
 				floorGeometry.rotateX( - Math.PI / 2 );
 
-				var floorMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+				var floorMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00, map: floortexture } );
+				
 
 				var floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				scene.add( floor );
@@ -300,23 +303,29 @@
 					holes.push(hole1);
 				}
 				
-				
+				var treasuretexture = new THREE.TextureLoader().load( 'golden.jpg' );
 				var treasureGeometry = new THREE.BoxGeometry( 20, 20, 20 );
-				var treasureMaterial = new THREE.MeshPhongMaterial( { specular: 0xffff00, flatShading: true, vertexColors: THREE.VertexColors } );
+				var treasureMaterial = new THREE.MeshPhongMaterial( { map: treasuretexture, specular: 0xffff00, flatShading: true, vertexColors: THREE.VertexColors } );
 				var treasure = new THREE.Mesh(treasureGeometry, treasureMaterial);
 				treasure.position.x = 510;
+				treasure.position.y = 10;
 				treasure.position.z = 340;
 				
 				scene.add(treasure);
+				
+				
+				var texture = new THREE.TextureLoader().load( 'collages-plain-stone-col4901-b.jpg' );
 				
 				
 				
 				// objects
 				for(var i = 0; i< walllength.length ; i++)
 				{
+					
+					
 					var boxGeometry = new THREE.BoxGeometry( walllength[i], wallheight, wallwidth[i] );
-
-					var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+					
+					var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, map: texture} );
 					var box = new THREE.Mesh( boxGeometry, boxMaterial );
 					box.position.x = wallposx[i];
 					box.position.z = wallposz[i];
@@ -324,9 +333,9 @@
 					objects.push(box);
 				}
 				
-				
+				var playertexture = new THREE.TextureLoader().load( 'images.jpg' );
 				var box2Geometry = new THREE.BoxGeometry( 20, 20, 20 );
-				var box2Material = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+				var box2Material = new THREE.MeshPhongMaterial( { map: playertexture, specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
 				box2 = new THREE.Mesh( box2Geometry, box2Material );
 				box2.position.x = startposx;
 				box2.position.z = startposz;
