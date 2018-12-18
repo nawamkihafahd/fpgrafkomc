@@ -72,7 +72,7 @@
 			var treasures = [];
 			var holeposx  = [60];
 			var holeposz = [-40];
-			var treasuresget;
+			var treasuresget = 0;
 
 
 			var moveForward = false;
@@ -219,11 +219,50 @@
 							camera.lookAt(box2.position)
 							break;
 						case 90:
-							//alert((box.position.x - treasure.position.x)*(box.position.x - treasure.position.x) + (box.position.z - treasure.position.z)*(box.position.z - treasure.position.z));
-							treasureget = 1;
+							
 							if((box2.position.x - treasure.position.x)*(box2.position.x - treasure.position.x) + (box2.position.z - treasure.position.z)*(box2.position.z - treasure.position.z) < 500)
 							{
-								alert("you get the treasure");
+								//alert(treasureget);
+								treasureget += 1;
+								alert("you get " + treasureget + " out of 5 treasures");
+								if(treasureget == 1)
+								{
+									treasure.position.x = 120;
+									treasure.position.z = 350;
+								}
+								if(treasureget == 2)
+								{
+									treasure.position.x = 150;
+									treasure.position.z = 70;
+								}
+								if(treasureget == 3)
+								{
+									treasure.position.x = 270;
+									treasure.position.z = 350;
+								}
+								if(treasureget == 4)
+								{
+									treasure.position.x = 240;
+									treasure.position.z = 390;
+								}
+								if(treasureget == 5)
+								{
+									alert("congratulations! you can now pay your debt!");
+									treasure.position.x = 510;
+									treasure.position.z = 340;
+									
+									treasureget = 0;
+									box2.position.x = startposx;
+									box2.position.z = startposz;
+									falling = false;
+							
+									viewmode = 0;
+							
+									camera.position.x = box2.position.x;
+									camera.position.z = box2.position.z + campos;
+							
+									camera.lookAt(box2.position);
+								}
 							}
 							break;
 							
@@ -572,11 +611,6 @@
 
 					}
 					
-					if(treasureget == 1)
-					{
-						treasureget = 0;
-						
-					}
 					
 					
 					
