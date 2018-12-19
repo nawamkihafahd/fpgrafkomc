@@ -18,6 +18,7 @@
 		</style>
 	</head>
 	<body>
+		<canvas id="myCanvas"></canvas>
 		<script src="three.js-master/build/three.js"></script>
 
 
@@ -28,8 +29,8 @@
 			var holes = [];
 			var treasures = [];
 			var bullets = [];
-			var holeposx  = [60];
-			var holeposz = [-40];
+			var holeposx  = [60, 60, 35, 85, 276, 175, 144, 225, 415, 445, 144, 215];
+			var holeposz = [-40, 35, 80, 80, 295, 345, 325, 185, 335, 345, 98, 96];
 			var treasuresget = 0;
 			var moveForward = false;
 			var moveBackward = false;
@@ -52,7 +53,7 @@
 			var wallwidth = [380, 20, 360, 20, 100, 20, 20, 20, 20, 160, 80, 100, 20, 160];
 			var wallposx = [10, 320, 530, 280, 110, 290, 380, 460, 460, 190, 250, 310, 340, 100];
 			var wallposz = [190, 10, 180, 370, 70, 130, 190, 270, 310, 280, 320, 310, 70, 260];
-			var bulletposx = [60, 280, 320];
+			var bulletposx = [60, 280, 330];
 			var bulletposy = [5, 5, 5];
 			var bulletposz = [360, 360, 360];
 			var bulletradius = 5;
@@ -71,9 +72,8 @@
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xffffff );
-				scene.fog = new THREE.Fog( 0xffffff, 0, 750 );
-				var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
-				light.position.set( 0.5, 1, 0.75 );
+				scene.fog = new THREE.Fog( 0x000000, 0, 300 );
+				var light = new THREE.HemisphereLight( 0xffffff, 0x000000, 0.5);
 				scene.add( light );
 				
 				var onKeyDown = function ( event ) {
@@ -178,13 +178,14 @@
 								}
 								if(treasureget == 3)
 								{
-									treasure.position.x = 270;
-									treasure.position.z = 350;
+									treasure.position.x = 240;
+									treasure.position.z = 390;
+									
 								}
 								if(treasureget == 4)
 								{
-									treasure.position.x = 240;
-									treasure.position.z = 390;
+									treasure.position.x = 270;
+									treasure.position.z = 350;
 								}
 								if(treasureget == 5)
 								{
@@ -205,7 +206,7 @@
 				floortexture.repeat.set( 15, 15 );
 				var floorGeometry = new THREE.PlaneGeometry( 2000, 2000, 100);
 				floorGeometry.rotateX( - Math.PI / 2 );
-				var floorMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00, map: floortexture } );
+				var floorMaterial = new THREE.MeshLambertMaterial( {map: floortexture } );
 				
 				var floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				scene.add( floor );
@@ -226,7 +227,7 @@
 				
 				var treasuretexture = new THREE.TextureLoader().load( 'golden.jpg' );
 				var treasureGeometry = new THREE.BoxGeometry( 20, 20, 20 );
-				var treasureMaterial = new THREE.MeshPhongMaterial( { map: treasuretexture, specular: 0xffff00, flatShading: true, vertexColors: THREE.VertexColors } );
+				var treasureMaterial = new THREE.MeshPhongMaterial( { map: treasuretexture } );
 				treasure = new THREE.Mesh(treasureGeometry, treasureMaterial);
 				treasure.position.x = 510;
 				treasure.position.y = 10;
@@ -239,14 +240,13 @@
 				
 				
 				
-				// objects
 				for(var i = 0; i< walllength.length ; i++)
 				{
 					
 					
 					var boxGeometry = new THREE.BoxGeometry( walllength[i], wallheight, wallwidth[i] );
 					
-					var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, map: texture} );
+					var boxMaterial = new THREE.MeshPhongMaterial( {map: texture} );
 					var box = new THREE.Mesh( boxGeometry, boxMaterial );
 					box.position.x = wallposx[i];
 					box.position.z = wallposz[i];
@@ -256,7 +256,7 @@
 				
 				var playertexture = new THREE.TextureLoader().load( 'images.jpg' );
 				var box2Geometry = new THREE.BoxGeometry( 20, 20, 20 );
-				var box2Material = new THREE.MeshPhongMaterial( { map: playertexture, specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+				var box2Material = new THREE.MeshPhongMaterial( { map: playertexture } );
 				box2 = new THREE.Mesh( box2Geometry, box2Material );
 				box2.position.x = startposx;
 				box2.position.z = startposz;
@@ -265,17 +265,17 @@
 				camera.lookAt(box2.position);
 				
 				//
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, canvas: myCanvas } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
-				//
-				window.addEventListener( 'resize', onWindowResize, false );
+				
+				
+				var bullettexture = new THREE.TextureLoader().load('bulletexture.jpg');
 				
 				for(var k = 0; k< bulletposx.length; k++)
 				{
-					var bulletGeometry = new THREE.BoxGeometry(2*bulletradius, 2*bulletradius, 2^bulletradius);
-					var bulletMaterial = new THREE.MeshPhongMaterial({ specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors })
+					var bulletGeometry = new THREE.BoxGeometry(2*bulletradius, 2*bulletradius, 2*bulletradius);
+					var bulletMaterial = new THREE.MeshPhongMaterial({map: bullettexture})
 					var boxmesh = new THREE.Mesh(bulletGeometry, bulletMaterial);
 					boxmesh.position.x = bulletposx[k];
 					boxmesh.position.z = bulletposz[k];
@@ -286,22 +286,14 @@
 				
 				
 			}
-			function onWindowResize() {
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-				renderer.setSize( window.innerWidth, window.innerHeight );
-			}
 			function animate() {
 				requestAnimationFrame( animate );
 					
-					var time = performance.now();
-					var delta = ( time - prevTime ) / 1000;
+					var delta = 0.2 / 12;
 					
 					direction.z = (Number( moveForward ) - Number( moveBackward ))*flagz;
 					direction.x = (Number( moveLeft ) - Number( moveRight ))*flagx;
 					direction.normalize();
-					//velocity.x -= velocity.x * 10.0 * delta;
-					//velocity.z -= velocity.z * 10.0 * delta;
 					
 					velocity.x = 0;
 					velocity.z = 0;
@@ -311,7 +303,7 @@
 					}
 					else
 					{
-						velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+						velocity.y -= 9.8 * 100.0 * delta;
 					}
 					
 					
@@ -330,6 +322,11 @@
 					if ( moveRight ) 
 					{
 						velocity.x -= direction.x * 2000.0 * delta;
+					}
+					if(falling == true && box2.position.y < 9)
+					{
+						velocity.x = 0;
+						velocity.z = 0;
 					}
 					
 					if(viewmode == 0)
@@ -546,7 +543,6 @@
 					
 					
 					
-					prevTime = time;
 				renderer.render( scene, camera );
 			}
 			function reset(){
@@ -641,6 +637,8 @@
 			}
 			
 		</script>
-		<embed src="scary-background-music-free-to-use.mp3" autostart="true" loop="true" width="0" height="0">
+		<audio autoplay loop>
+			<source src="scary-background-music-free-to-use.mp3" type="audio/mpeg">
+		</audio>
 	</body>
 </html>
