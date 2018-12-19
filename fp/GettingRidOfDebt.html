@@ -2,9 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js - pointerlock controls</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<title>Getting Rid of Debt</title>
 		<style>
 			html, body {
 				width: 100%;
@@ -24,6 +22,7 @@
 
 		<script>
 			var camera, scene, renderer, controls;
+			var delta = 0.2 / 12;
 			var wallmat;
 			var objects = [];
 			var holes = [];
@@ -289,8 +288,77 @@
 			function animate() {
 				requestAnimationFrame( animate );
 					
-					var delta = 0.2 / 12;
 					
+					setSpeed();
+					
+					changecamcontrol();
+					
+					holecontrol();
+					gravity();
+					bulletinteraction();
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+				renderer.render( scene, camera );
+			}
+			function holecontrol()
+			{
+				for(var i = 0; i<holes.length ; i++)
+					{
+						if(box2.position.x > holes[i].position.x - holesize/2 && box2.position.x < holes[i].position.x + holesize/2 && box2.position.z > holes[i].position.z - holesize/2 && box2.position.z  < holes[i].position.z + holesize/2)
+						{
+							falling = true;
+							break;
+						}
+						falling = false;
+					}
+			}
+			function gravity()
+			{
+				if ( box2.position.y < 10 ) {
+						if(falling === false)
+						{
+							onground = 1;
+							velocity.y = 0;
+							box2.position.y = 10;
+							canJump = true;
+						}
+						if(box2.position.y < -100)
+						{
+							reset();
+							
+						}
+						
+					}
+			}
+			function bulletinteraction()
+			{
+				for(var j = 0; j<bullets.length; j++)
+					{
+						bullets[j].translateZ(-1);
+						hitbybullet(j);
+						if(bullets[j].position.z < -10)
+						{
+							bullets[j].position.z = bulletposz[j];
+						}
+					}
+			}
+			function setSpeed()
+			{
+				
 					direction.z = (Number( moveForward ) - Number( moveBackward ))*flagz;
 					direction.x = (Number( moveLeft ) - Number( moveRight ))*flagx;
 					direction.normalize();
@@ -328,8 +396,100 @@
 						velocity.x = 0;
 						velocity.z = 0;
 					}
+			}
+			function reset(){
+				box2.position.x = startposx;
+				box2.position.z = startposz;
+				falling = false;
+							
+				viewmode = 0;
+							
+				camera.position.x = box2.position.x;
+				camera.position.z = box2.position.z + campos;
+							
+				camera.lookAt(box2.position);
+				treasure.position.x = 510;
+				treasure.position.y = 10;
+				treasure.position.z = 340;
+				treasureget = 0;
+				for(var j = 0; j<bullets.length; j++)
+					{
+						bullets[j].position.z = bulletposz[j];
+					}
+			}
+			
+			function hitbybullet(j){
+			
+				if((bullets[j].position.z - bulletradius) <= (box2.position.z + 10) && (bullets[j].position.z - box2.position.z < 10 + bulletradius) && (bullets[j].position.z - box2.position.z >= 0))
+				{
+					//alert("in z");
+					if(((bullets[j].position.x + bulletradius) >= (box2.position.x -10))&& (-bullets[j].position.x + box2.position.x < 10 + bulletradius) && (-bullets[j].position.x + box2.position.x >=0))
+					{
+						//alert("in x");
+						if((bullets[j].position.y - bulletradius) <= (box2.position.y + 10) && (bullets[j].position.y - box2.position.y < 10 + bulletradius) && (bullets[j].position.y - box2.position.y >= 0))
+						{
+							//alert("in y");
+							reset();
+						}
+						if((bullets[j].position.y + bulletradius) >= (box2.position.y - 10) && (-bullets[j].position.y + box2.position.y < 10 + bulletradius) && (-bullets[j].position.y + box2.position.y >= 0))
+						{
+							//alert("in y2");
+							reset();
+						}
+					}
+					if(((bullets[j].position.x - bulletradius) <= (box2.position.x +10)) && (bullets[j].position.x - box2.position.x < 10 + bulletradius) && (bullets[j].position.x - box2.position.x >= 0))
+					{
+						//alert("in x2");
+						if((bullets[j].position.y - bulletradius) <= (box2.position.y + 10) && (bullets[j].position.y - box2.position.y < 10 + bulletradius) && (bullets[j].position.y - box2.position.y >= 0))
+						{
+							//alert("in y");
+							reset();
+						}
+						if((bullets[j].position.y + bulletradius) >= (box2.position.y - 10) && (-bullets[j].position.y + box2.position.y < 10 + bulletradius) && (-bullets[j].position.y + box2.position.y >= 0))
+						{
+							//alert("in y2");
+							reset();
+						}
+					}
 					
-					if(viewmode == 0)
+				}
+				if((bullets[j].position.z + bulletradius) >= (box2.position.z - 10) && (-bullets[j].position.z + box2.position.z < 10 + bulletradius) && (-bullets[j].position.z + box2.position.z >= 0))
+				{
+					//alert("in z2");
+					if(((bullets[j].position.x + bulletradius) >= (box2.position.x -10))&& (-bullets[j].position.x + box2.position.x < 10 + bulletradius) && (-bullets[j].position.x + box2.position.x >= 0))
+					{
+						//alert("in x");
+						if((bullets[j].position.y - bulletradius) <= (box2.position.y + 10) && (bullets[j].position.y - box2.position.y < 10 + bulletradius) && (bullets[j].position.y - box2.position.y >= 0))
+						{
+							//alert("in y");
+							reset();
+						}
+						if((bullets[j].position.y + bulletradius) >= (box2.position.y - 10) && (-bullets[j].position.y + box2.position.y < 10 + bulletradius) && (-bullets[j].position.y + box2.position.y >= 0))
+						{
+							//alert("in y2");
+							reset();
+						}
+					}
+					if(((bullets[j].position.x - bulletradius) <= (box2.position.x +10)) && (bullets[j].position.x - box2.position.x < 10 + bulletradius) && (bullets[j].position.x - box2.position.x >= 0))
+					{
+						//alert("in x2");
+						if((bullets[j].position.y - bulletradius) <= (box2.position.y + 10) && (bullets[j].position.y - box2.position.y < 10 + bulletradius) && (bullets[j].position.y - box2.position.y >= 0))
+						{
+							//alert("in y");
+							reset();
+						}
+						if((bullets[j].position.y + bulletradius) >= (box2.position.y - 10) && (-bullets[j].position.y + box2.position.y < 10 + bulletradius) && (-bullets[j].position.y + box2.position.y >= 0))
+						{
+							//alert("in y2");
+							reset();
+						}
+					}
+					
+				}
+			}
+			function changecamcontrol()
+			{
+				if(viewmode == 0)
 					{
 						box2.translateX( velocity.x * delta );
 						box2.translateY( velocity.y * delta );
@@ -497,143 +657,6 @@
 							}
 						}
 					}
-					
-					for(var i = 0; i<holes.length ; i++)
-					{
-						if(box2.position.x > holes[i].position.x - holesize/2 && box2.position.x < holes[i].position.x + holesize/2 && box2.position.z > holes[i].position.z - holesize/2 && box2.position.z  < holes[i].position.z + holesize/2)
-						{
-							falling = true;
-							break;
-						}
-						falling = false;
-					}
-					
-					
-					
-					if ( box2.position.y < 10 ) {
-						if(falling === false)
-						{
-							onground = 1;
-							velocity.y = 0;
-							box2.position.y = 10;
-							canJump = true;
-						}
-						if(box2.position.y < -100)
-						{
-							reset();
-							
-						}
-						
-					}
-					
-					for(var j = 0; j<bullets.length; j++)
-					{
-						bullets[j].translateZ(-1);
-						hitbybullet(j);
-						if(bullets[j].position.z < -10)
-						{
-							bullets[j].position.z = bulletposz[j];
-						}
-					}
-					
-					
-					
-					
-					
-					
-					
-					
-				renderer.render( scene, camera );
-			}
-			function reset(){
-				box2.position.x = startposx;
-				box2.position.z = startposz;
-				falling = false;
-							
-				viewmode = 0;
-							
-				camera.position.x = box2.position.x;
-				camera.position.z = box2.position.z + campos;
-							
-				camera.lookAt(box2.position);
-				treasure.position.x = 510;
-				treasure.position.y = 10;
-				treasure.position.z = 340;
-				treasureget = 0;
-				for(var j = 0; j<bullets.length; j++)
-					{
-						bullets[j].position.z = bulletposz[j];
-					}
-			}
-			
-			function hitbybullet(j){
-			
-				if((bullets[j].position.z - bulletradius) <= (box2.position.z + 10) && (bullets[j].position.z - box2.position.z < 10 + bulletradius) && (bullets[j].position.z - box2.position.z >= 0))
-				{
-					//alert("in z");
-					if(((bullets[j].position.x + bulletradius) >= (box2.position.x -10))&& (-bullets[j].position.x + box2.position.x < 10 + bulletradius) && (-bullets[j].position.x + box2.position.x >=0))
-					{
-						//alert("in x");
-						if((bullets[j].position.y - bulletradius) <= (box2.position.y + 10) && (bullets[j].position.y - box2.position.y < 10 + bulletradius) && (bullets[j].position.y - box2.position.y >= 0))
-						{
-							//alert("in y");
-							reset();
-						}
-						if((bullets[j].position.y + bulletradius) >= (box2.position.y - 10) && (-bullets[j].position.y + box2.position.y < 10 + bulletradius) && (-bullets[j].position.y + box2.position.y >= 0))
-						{
-							//alert("in y2");
-							reset();
-						}
-					}
-					if(((bullets[j].position.x - bulletradius) <= (box2.position.x +10)) && (bullets[j].position.x - box2.position.x < 10 + bulletradius) && (bullets[j].position.x - box2.position.x >= 0))
-					{
-						//alert("in x2");
-						if((bullets[j].position.y - bulletradius) <= (box2.position.y + 10) && (bullets[j].position.y - box2.position.y < 10 + bulletradius) && (bullets[j].position.y - box2.position.y >= 0))
-						{
-							//alert("in y");
-							reset();
-						}
-						if((bullets[j].position.y + bulletradius) >= (box2.position.y - 10) && (-bullets[j].position.y + box2.position.y < 10 + bulletradius) && (-bullets[j].position.y + box2.position.y >= 0))
-						{
-							//alert("in y2");
-							reset();
-						}
-					}
-					
-				}
-				if((bullets[j].position.z + bulletradius) >= (box2.position.z - 10) && (-bullets[j].position.z + box2.position.z < 10 + bulletradius) && (-bullets[j].position.z + box2.position.z >= 0))
-				{
-					//alert("in z2");
-					if(((bullets[j].position.x + bulletradius) >= (box2.position.x -10))&& (-bullets[j].position.x + box2.position.x < 10 + bulletradius) && (-bullets[j].position.x + box2.position.x >= 0))
-					{
-						//alert("in x");
-						if((bullets[j].position.y - bulletradius) <= (box2.position.y + 10) && (bullets[j].position.y - box2.position.y < 10 + bulletradius) && (bullets[j].position.y - box2.position.y >= 0))
-						{
-							//alert("in y");
-							reset();
-						}
-						if((bullets[j].position.y + bulletradius) >= (box2.position.y - 10) && (-bullets[j].position.y + box2.position.y < 10 + bulletradius) && (-bullets[j].position.y + box2.position.y >= 0))
-						{
-							//alert("in y2");
-							reset();
-						}
-					}
-					if(((bullets[j].position.x - bulletradius) <= (box2.position.x +10)) && (bullets[j].position.x - box2.position.x < 10 + bulletradius) && (bullets[j].position.x - box2.position.x >= 0))
-					{
-						//alert("in x2");
-						if((bullets[j].position.y - bulletradius) <= (box2.position.y + 10) && (bullets[j].position.y - box2.position.y < 10 + bulletradius) && (bullets[j].position.y - box2.position.y >= 0))
-						{
-							//alert("in y");
-							reset();
-						}
-						if((bullets[j].position.y + bulletradius) >= (box2.position.y - 10) && (-bullets[j].position.y + box2.position.y < 10 + bulletradius) && (-bullets[j].position.y + box2.position.y >= 0))
-						{
-							//alert("in y2");
-							reset();
-						}
-					}
-					
-				}
 			}
 			
 		</script>
